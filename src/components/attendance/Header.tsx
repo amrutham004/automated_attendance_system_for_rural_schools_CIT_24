@@ -50,7 +50,7 @@ const Header = () => {
           <SchoolLogo size="small" />
           <div className="hidden sm:block">
             <h1 className="text-lg font-bold font-display text-foreground">AttendaGo</h1>
-            <p className="text-xs text-muted-foreground">Attendance System</p>
+            
           </div>
         </Link>
 
