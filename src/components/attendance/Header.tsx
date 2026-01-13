@@ -12,6 +12,7 @@
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Home, ClipboardCheck, LayoutDashboard, User, Menu, X, ScanLine } from 'lucide-react';
+import logoImg from '@/assets/logo.png';
 import { useState } from 'react';
 const Header = () => {
   const location = useLocation();
@@ -48,9 +49,11 @@ const Header = () => {
       <div className="container flex h-16 items-center justify-between">
         {/* Logo and School Name */}
         <Link to="/" className="flex items-center gap-3 group">
-          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-cyan-400 to-teal-500 flex items-center justify-center shadow-lg shadow-cyan-500/30 group-hover:shadow-cyan-500/50 transition-shadow">
-            <span className="text-white font-bold text-lg">A</span>
-          </div>
+          <img 
+            src={logoImg} 
+            alt="AttendaGo Logo" 
+            className="w-10 h-10 rounded-full shadow-lg shadow-cyan-500/30 group-hover:shadow-cyan-500/50 transition-shadow object-cover"
+          />
           <div className="hidden sm:block">
             <h1 className="text-lg font-bold font-display bg-gradient-to-r from-cyan-300 to-teal-300 bg-clip-text text-transparent">
               AttendaGo
