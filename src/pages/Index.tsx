@@ -140,6 +140,15 @@ const Index = () => {
           </div>
         </div>
       </main>
+
+      {/* Footer */}
+      <footer className="relative z-10 py-6 border-t border-white/10 bg-slate-900/50 backdrop-blur-sm">
+        <div className="container text-center">
+          <p className="text-cyan-100/60 text-sm">
+            © {new Date().getFullYear()} CIT_24. All rights reserved.
+          </p>
+        </div>
+      </footer>
     </div>
   );
 };
