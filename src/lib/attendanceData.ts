@@ -313,14 +313,14 @@ export const useAttendanceToken = (token: string): {
 
 /**
  * Generate attendance URL for QR code
- * Uses current origin for dynamic domain support
+ * Uses localhost:8080 for local development
  */
 export const generateAttendanceURL = (studentId: string): string => {
   const token = generateAttendanceToken(studentId);
   if (!token) return '';
   
-  // Use current origin for dynamic domain support (works in preview, localhost, production)
-  const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'http://localhost:8080';
+  // Use localhost for local testing - students scan with phone and open this URL
+  const baseUrl = 'http://localhost:8080';
   return `${baseUrl}/verify-attendance?token=${token}`;
 };
 
