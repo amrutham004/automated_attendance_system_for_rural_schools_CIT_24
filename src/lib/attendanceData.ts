@@ -313,14 +313,15 @@ export const useAttendanceToken = (token: string): {
 
 /**
  * Generate attendance URL for QR code
- * Uses local network IP for phone scanning
+ * Uses local network IP for phone scanning (Vite dev server port 5173)
  */
 export const generateAttendanceURL = (studentId: string): string => {
   const token = generateAttendanceToken(studentId);
   if (!token) return '';
   
   // Local network IP - phones on same network can access this
-  const baseUrl = 'http://192.168.1.100:8080';
+  // Port 5173 is Vite's default dev server port
+  const baseUrl = 'http://192.168.1.100:5173';
   return `${baseUrl}/verify-attendance?token=${token}`;
 };
 
