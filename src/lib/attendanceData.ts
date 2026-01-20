@@ -17,16 +17,9 @@ import { Student, AttendanceRecord, AttendanceStatus, DashboardStats, StudentSta
 // In a real app, this would come from a database
 // ========================================
 export const students: Student[] = [
-  { id: 'STU001', name: 'Aditi Sharma', grade: '8A' },
-  { id: 'STU002', name: 'Rahul Kumar', grade: '8A' },
-  { id: 'STU003', name: 'Priya Singh', grade: '8B' },
-  { id: 'STU004', name: 'Amit Patel', grade: '8A' },
-  { id: 'STU005', name: 'Sneha Reddy', grade: '8B' },
-  { id: 'STU006', name: 'Vikram Yadav', grade: '9A' },
-  { id: 'STU007', name: 'Kavitha Nair', grade: '9A' },
-  { id: 'STU008', name: 'Ravi Verma', grade: '9B' },
-  { id: 'STU009', name: 'Meera Joshi', grade: '9B' },
-  { id: 'STU010', name: 'Arjun Das', grade: '10A' },
+  { id: '20221CIT0043', name: 'Amrutha M', grade: '8CIT02' },
+  { id: '20221CIT0049', name: 'C M Shalini', grade: '8CIT01' },
+  { id: '20221CIT0153', name: 'Vismaya L', grade: '8CIT03' },
 ];
 
 // ========================================
