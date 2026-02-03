@@ -44,7 +44,7 @@ const Index = () => {
           </p>
           <p className="text-sm text-teal-200/60 flex items-center justify-center gap-2">
             <Clock size={14} />
-            Cutoff time: {CUTOFF_TIME} AM
+            Cutoff time: 1:00 PM
           </p>
         </div>
 

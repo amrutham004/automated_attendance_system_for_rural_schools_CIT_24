@@ -78,13 +78,13 @@ const StudentDashboard = () => {
               <Label htmlFor="studentSearch" className="text-teal-100">Enter Your Student ID</Label>
               <Input
                 id="studentSearch"
-                placeholder="e.g., STU001"
+                placeholder="e.g., 20221CIT0043"
                 value={studentId}
                 onChange={(e) => setStudentId(e.target.value)}
                 className="font-mono uppercase bg-white/10 border-white/20 text-white placeholder:text-white/40"
               />
               <p className="text-xs text-teal-200/60">
-                Demo IDs: {students.slice(0, 3).map(s => s.id).join(', ')}...
+                Valid IDs: {students.slice(0, 3).map(s => s.id).join(', ')}
               </p>
             </div>
             <div className="flex items-end">

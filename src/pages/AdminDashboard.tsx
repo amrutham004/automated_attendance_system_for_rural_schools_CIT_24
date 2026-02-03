@@ -5,7 +5,6 @@
  * - Overview statistics with 3D styled cards
  * - Weekly attendance chart
  * - Export functionality
- * - Student photo upload
  * - Today's attendance table
  */
 
@@ -17,7 +16,6 @@ import FloatingCard from '@/components/3d/FloatingCard';
 import GlassButton from '@/components/3d/GlassButton';
 import StatusBadge from '@/components/attendance/StatusBadge';
 import TeacherScanCard from '@/components/attendance/TeacherScanCard';
-import StudentPhotoUpload from '@/components/attendance/StudentPhotoUpload';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
@@ -160,8 +158,6 @@ const AdminDashboard = () => {
                 </GlassButton>
               </div>
             </FloatingCard>
-
-            <StudentPhotoUpload />
           </div>
         </div>
 

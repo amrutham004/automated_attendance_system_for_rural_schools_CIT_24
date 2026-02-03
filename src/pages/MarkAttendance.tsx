@@ -230,14 +230,14 @@ const MarkAttendance = () => {
                   <Label htmlFor="studentId" className="text-teal-100">Student ID</Label>
                   <Input
                     id="studentId"
-                    placeholder="e.g., STU001"
+                    placeholder="e.g., 20221CIT0043"
                     value={studentId}
                     onChange={(e) => setStudentId(e.target.value)}
                     required
                     className="text-center text-lg font-mono uppercase bg-white/10 border-white/20 text-white placeholder:text-white/40"
                   />
                   <p className="text-xs text-teal-200/60">
-                    Demo IDs: STU001 - STU010
+                    Example: 20221CIT0043 (Amrutha M)
                   </p>
                 </div>
 

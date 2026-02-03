@@ -10,9 +10,11 @@ export type AttendanceStatus = 'PRESENT' | 'LATE_PRESENT' | 'ABSENT';
 
 // Student information
 export interface Student {
-  id: string;        // Unique student ID (e.g., "STU001")
+  id: string;        // Unique student ID (e.g., "20221CIT0043")
   name: string;      // Full name of the student
-  grade: string;     // Class/grade (e.g., "8A")
+  grade: string;     // Class/grade (e.g., "CIT 2022")
+  department?: string; // Department name (e.g., "Computer and Information Technology")
+  email?: string;    // Email address (optional)
   photoUrl?: string; // Optional reference photo URL for face verification
 }
 

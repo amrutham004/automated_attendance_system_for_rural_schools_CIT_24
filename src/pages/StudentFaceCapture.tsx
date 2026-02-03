@@ -4,7 +4,7 @@
  * Standalone page for students to capture their face photo
  * after their attendance has been recorded.
  * 
- * Accessed via: /face-capture?roll_no=STU001
+ * Accessed via: /face-capture?roll_no=20221CIT0043
  */
 
 import { useState, useRef, useCallback, useEffect } from 'react';
@@ -72,30 +72,6 @@ const StudentFaceCapture = () => {
     startCamera();
   }, [rollNo]);
 
-  const startCamera = useCallback(async () => {
-    try {
-      setError('');
-      
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: {
-          facingMode: 'user',
-          width: { ideal: 640 },
-          height: { ideal: 480 }
-        }
-      });
-      
-      streamRef.current = stream;
-      
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        setIsStreaming(true);
-      }
-    } catch (err) {
-      console.error('Camera access error:', err);
-      setError('Unable to access camera. Please grant camera permissions.');
-    }
-  }, []);
-
   const stopCamera = useCallback(() => {
     if (streamRef.current) {
       streamRef.current.getTracks().forEach(track => track.stop());
@@ -103,6 +79,153 @@ const StudentFaceCapture = () => {
     }
     setIsStreaming(false);
   }, []);
+
+  const startCamera = useCallback(async () => {
+    try {
+      // Stop any existing stream first
+      stopCamera();
+      
+      // Enhanced iOS detection
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+      const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+      
+      console.log('Camera detection:', { isIOS, isSafari, userAgent: navigator.userAgent });
+      
+      // Progressive camera constraints - start simple, then enhance
+      const constraintsList = [
+        // iOS Safari specific - most compatible
+        {
+          video: {
+            facingMode: 'user',
+            width: { ideal: 320, max: 640 },
+            height: { ideal: 240, max: 480 }
+          },
+          audio: false
+        },
+        // Fallback - very basic
+        {
+          video: true,
+          audio: false
+        },
+        // iOS with specific constraints
+        {
+          video: {
+            facingMode: 'user'
+          },
+          audio: false
+        }
+      ];
+      
+      let stream = null;
+      let lastError = null;
+      
+      // Try each constraint set until one works
+      for (let i = 0; i < constraintsList.length; i++) {
+        const constraints = constraintsList[i];
+        console.log(`Trying camera constraint set ${i + 1}:`, constraints);
+        
+        try {
+          // For iOS Safari, sometimes we need to request permissions first
+          if (isIOS && isSafari && i === 0) {
+            console.log('iOS Safari detected - requesting permissions...');
+          }
+          
+          stream = await navigator.mediaDevices.getUserMedia(constraints);
+          console.log(`Camera access successful with constraint set ${i + 1}`);
+          break; // Success - exit the loop
+          
+        } catch (err: any) {
+          console.warn(`Constraint set ${i + 1} failed:`, err.name, err.message);
+          lastError = err;
+          
+          // If this is a permission error, don't try other constraints
+          if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+            break;
+          }
+        }
+      }
+      
+      if (!stream) {
+        // Handle the final error
+        if (lastError) {
+          console.error('All camera attempts failed:', lastError);
+          
+          if (lastError.name === 'NotAllowedError' || lastError.name === 'PermissionDeniedError') {
+            if (isIOS) {
+              setError(`Camera permission denied on iOS. 
+
+To fix this:
+1. Go to Settings > Safari > Camera
+2. Set to "Allow" or "Ask"
+3. Close this tab and reopen
+4. Try again`);
+            } else {
+              setError('Camera permission denied. Please allow camera access in your browser settings.');
+            }
+          } else if (lastError.name === 'NotFoundError') {
+            setError('No camera found. Please ensure your device has a working camera.');
+          } else if (lastError.name === 'NotReadableError' || lastError.name === 'TrackStartError') {
+            setError('Camera is already in use by another application. Please close other apps and try again.');
+          } else if (lastError.name === 'OverconstrainedError') {
+            setError('Camera does not support the required settings. Trying basic mode...');
+            // Try one more time with very basic settings
+            try {
+              stream = await navigator.mediaDevices.getUserMedia({ video: true });
+            } catch (finalErr: any) {
+              setError(`Camera access failed: ${finalErr.message}`);
+            }
+          } else {
+            setError(`Camera access failed: ${lastError.message}. Please try refreshing the page.`);
+          }
+        } else {
+          setError('Unknown camera error occurred. Please try refreshing the page.');
+        }
+        return;
+      }
+      
+      // Success - set up the stream
+      streamRef.current = stream;
+      
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        
+        // Wait for video to be ready
+        videoRef.current.onloadedmetadata = () => {
+          // iOS Safari specific handling
+          if (isIOS && isSafari) {
+            console.log('iOS Safari video loaded - ensuring playback...');
+            // Add a small delay for iOS
+            setTimeout(() => {
+              videoRef.current?.play().catch(playErr => {
+                console.error('iOS video play failed:', playErr);
+                setError('Video playback failed on iOS. Please try again.');
+              });
+            }, 100);
+          } else {
+            videoRef.current?.play().catch(playErr => {
+              console.error('Video play failed:', playErr);
+            });
+          }
+          
+          // Add a small delay before setting streaming state
+          setTimeout(() => {
+            setIsStreaming(true);
+            setError(null);
+          }, 200);
+        };
+        
+        // Handle video errors
+        videoRef.current.onerror = (videoErr) => {
+          console.error('Video element error:', videoErr);
+          setError('Video display error. Please try again.');
+        };
+      }
+      
+    } catch (err: any) {
+      console.error('Camera initialization failed:', err);
+      setError(`Failed to start camera: ${err.message || 'Unknown error'}`);
+    }
+  }, [stopCamera]);
 
   const capturePhoto = useCallback(() => {
     if (!videoRef.current || !canvasRef.current) return;
@@ -200,19 +323,33 @@ const StudentFaceCapture = () => {
                 </div>
 
                 {error && (
-                  <p className="text-sm text-red-400 text-center">{error}</p>
+                  <div className="space-y-3">
+                    <p className="text-sm text-red-400 text-center">{error}</p>
+                    
+                    {/* Retry Camera Button */}
+                    <GlassButton 
+                      onClick={startCamera} 
+                      className="w-full"
+                      variant="secondary"
+                    >
+                      <Camera size={18} />
+                      Retry Camera Access
+                    </GlassButton>
+                  </div>
                 )}
 
                 {/* Capture Button */}
-                <GlassButton 
-                  onClick={capturePhoto} 
-                  disabled={!isStreaming}
-                  className="w-full"
-                  variant="primary"
-                >
-                  <Camera size={18} />
-                  Capture Face
-                </GlassButton>
+                {!error && (
+                  <GlassButton 
+                    onClick={capturePhoto} 
+                    disabled={!isStreaming}
+                    className="w-full"
+                    variant="primary"
+                  >
+                    <Camera size={18} />
+                    Capture Face
+                  </GlassButton>
+                )}
               </div>
             </FloatingCard>
 

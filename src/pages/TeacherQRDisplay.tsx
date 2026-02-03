@@ -40,6 +40,9 @@ const TeacherQRDisplay = () => {
 
   // Generate new QR URL
   const generateNewQR = useCallback(() => {
+    // Clear any existing QR URL first
+    setQrUrl('');
+    
     const url = generateAttendanceURL(studentId.toUpperCase());
     setQrUrl(url);
     setTimeRemaining(QR_VALIDITY_SECONDS);
@@ -48,14 +51,18 @@ const TeacherQRDisplay = () => {
   // Countdown timer
   useEffect(() => {
     if (step !== 'qr-display') return;
-    generateNewQR();
+    
+    // Only generate QR once when entering qr-display step
+    if (!qrUrl) {
+      generateNewQR();
+    }
 
     const countdownInterval = setInterval(() => {
       setTimeRemaining(prev => (prev <= 1 ? 0 : prev - 1));
     }, 1000);
 
     return () => clearInterval(countdownInterval);
-  }, [step, generateNewQR]);
+  }, [step]); // Remove generateNewQR from dependencies
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -82,6 +89,7 @@ const TeacherQRDisplay = () => {
     setStudentId('');
     setStudentName('');
     setQrUrl('');
+    setTimeRemaining(QR_VALIDITY_SECONDS); // Reset timer
     setError('');
   };
 
@@ -125,14 +133,14 @@ const TeacherQRDisplay = () => {
                   <Label htmlFor="studentId" className="text-cyan-100">Student ID</Label>
                   <Input
                     id="studentId"
-                    placeholder="e.g., STU001"
+                    placeholder="e.g., 20221CIT0043"
                     value={studentId}
                     onChange={(e) => setStudentId(e.target.value)}
                     required
                     className="text-center text-lg font-mono uppercase bg-white/10 border-white/20 text-white placeholder:text-white/40"
                   />
                   <p className="text-xs text-cyan-200/60">
-                    Demo IDs: STU001 - STU010
+                    Valid IDs: 20221CIT0043, 20221CIT0049, 20221CIT0151
                   </p>
                 </div>
 

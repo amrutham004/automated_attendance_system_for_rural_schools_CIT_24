@@ -17,20 +17,41 @@ import { Student, AttendanceRecord, AttendanceStatus, DashboardStats, StudentSta
 // In a real app, this would come from a database
 // ========================================
 export const students: Student[] = [
-  { id: '20221CIT0043', name: 'Amrutha M', grade: '8CIT02' },
-  { id: '20221CIT0049', name: 'C M Shalini', grade: '8CIT01' },
-  { id: '20221CIT0153', name: 'Vismaya L', grade: '8CIT03' },
+  { 
+    id: '20221CIT0043', 
+    name: 'Amrutha M', 
+    grade: 'CIT 2022',
+    department: 'Computer and Information Technology',
+    email: 'amrutha.m@college.edu'
+  },
+  { 
+    id: '20221CIT0049', 
+    name: 'CM Shalini', 
+    grade: 'CIT 2022',
+    department: 'Computer and Information Technology',
+    email: 'shalini.cm@college.edu'
+  },
+  { 
+    id: '20221CIT0151', 
+    name: 'Vismaya L', 
+    grade: 'CIT 2022',
+    department: 'Computer and Information Technology',
+    email: 'vismaya.l@college.edu'
+  },
 ];
 
 // ========================================
 // CONSTANTS
 // ========================================
 
-// Time after which attendance is marked as "late" (11:00 AM)
-export const CUTOFF_TIME = '11:00';
+// Student ID validation regex
+export const STUDENT_ID_REGEX = /^20221CIT\d{4}$/;
+
+// Time after which attendance is marked as "late" (1:00 PM)
+export const CUTOFF_TIME = '13:00';
 
 // QR codes expire after this many seconds (security feature)
-export const QR_VALIDITY_SECONDS = 30;
+export const QR_VALIDITY_SECONDS = 60; 
 
 // How often QR codes refresh (in milliseconds)
 export const QR_REFRESH_INTERVAL = 5000;
@@ -180,8 +201,13 @@ export const generateAttendanceToken = (studentId: string): string => {
   
   // Store token
   const tokens = getAttendanceTokens();
+  
+  // Clean up expired tokens first
+  const now = Date.now();
+  const validTokens = tokens.filter(t => t.expiryTimestamp > now && !t.isUsed);
+  
   // Remove old tokens for this student
-  const filteredTokens = tokens.filter(t => t.studentId !== studentId);
+  const filteredTokens = validTokens.filter(t => t.studentId !== studentId);
   filteredTokens.push(tokenRecord);
   saveAttendanceTokens(filteredTokens);
   
@@ -236,6 +262,10 @@ export const validateAttendanceToken = (token: string): {
   // Check if expired
   const now = Date.now();
   if (now > tokenRecord.expiryTimestamp) {
+    // Clean up expired token
+    const updatedTokens = tokens.filter(t => t.token !== token);
+    saveAttendanceTokens(updatedTokens);
+    
     return { 
       valid: false, 
       studentId: tokenRecord.studentId,
@@ -312,8 +342,10 @@ export const generateAttendanceURL = (studentId: string): string => {
   const token = generateAttendanceToken(studentId);
   if (!token) return '';
   
-  // Local network address - phones on same network can access this
-  const baseUrl = 'http://192.168.0.112:8080';
+  // Dynamic base URL - supports both localhost and network access
+  const baseUrl = window.location.hostname === 'localhost' 
+    ? 'http://localhost:8080' 
+    : 'http://192.168.0.108:8080';
   return `${baseUrl}/verify-attendance?token=${token}`;
 };
 
